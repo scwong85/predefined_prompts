@@ -5,6 +5,9 @@ const phrases = {
   "Pretend to be": "Pretend you are an expert level "
 };
 
+const quiz_category = []
+quiz_category.push("GMAT Critical Reasoning", "IQ test", "AWS Solutions Architect")
+
 // Create a variable to store the context menu id
 let menuId = null;
 
@@ -14,6 +17,13 @@ chrome.runtime.onInstalled.addListener(() => {
   menuId = chrome.contextMenus.create({
     id: "phrase-copier",
     title: "Paste prompts",
+    contexts: ["all"]
+  });
+
+  // Quiz context menu
+  quizId = chrome.contextMenus.create({
+    id: "quiz",
+    title: "Create quiz for",
     contexts: ["all"]
   });
 
@@ -32,7 +42,18 @@ chrome.runtime.onInstalled.addListener(() => {
       parentId: menuId,
       contexts: ["all"]
     });
- });
+  });
+
+  // Add the quiz as submenus
+  quiz_category.forEach(function (item, index) {  
+    chrome.contextMenus.create({
+      id: `quiz-${item}`,
+      title: item,
+      parentId: quizId,
+      contexts: ["all"]
+    });
+  });
+  
 });
 
 // Listen for menu item clicks
@@ -40,11 +61,19 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   // Get the phrase key from the menu item id
   if (info.menuItemId == "limit-breaker") {
     chrome.tabs.sendMessage(tab.id, "breaklimit");
-  }
-  else {
-    let key = info.menuItemId.split("-")[1];
+  } else if (info.menuItemId.includes("phrase")) {
+    var key = info.menuItemId.split("-")[1];
     // Send a message to the content script with the phrase to copy
     chrome.tabs.sendMessage(tab.id, {phrase: phrases[key]});
+  } else if (info.menuItemId.includes("quiz")) {
+    var quiz = info.menuItemId.split("-")[1];
+    var quiz_prompt = `Simulate questions for ${quiz}. For each round, come up with a multiple choice questions with 5 possible answers (a,b,c,d,e). There is only one correct answer. For each correct answer, award 2 points. Create 10 rounds of questions. Accumulate the points from each round and display the total accumulated points for each round. Do not show the answer before I answer the question. Wait for my response in each round before asking the next question. After I answer a question, don't wait for any confirmation, just display the next question. Do not repeat the question. Please give explanation for each possible answer why they are correct or why they are wrong. At the end of the game, display total points and ask if I want to play again`
+    // Send a message to the content script with the phrase to copy
+    chrome.tabs.sendMessage(tab.id, {phrase: quiz_prompt});
+  } else {
+    chrome.tabs.sendMessage(tab.id, {phrase: `Hello Copilot ${info.menuItemId}`});
   }
+
+
 
 });
