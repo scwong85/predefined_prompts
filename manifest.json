@@ -1,10 +1,11 @@
 {
     "manifest_version": 3,
-    "name": "Phrase Copier",
+    "name": "Prompt Shortcut",
     "version": "1.0",
     "description": "An extension that copies predefined phrases to clipboard",
     "background": {
-      "service_worker": "background.js"
+      "service_worker": "background.js",
+      "type": "module"
     },
     "content_scripts": [
       {
