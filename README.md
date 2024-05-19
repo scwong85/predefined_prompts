@@ -17,3 +17,5 @@ Go to the browser extension setting page and switch on Developer mode.
 Click `Load unpacked` button and select the repo directory that you just cloned.
 
 The plugin can be accessed by right clicking in the chat box in Copilot to paste different prompts.
+
+Remember to reload the extension from the browser extension setting and also reload the webpage when you change anything, such as settings.js
